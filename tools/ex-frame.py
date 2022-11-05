@@ -1,12 +1,17 @@
 import os
 import cv2
 from tqdm import tqdm
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import sys
 ROOT = os.getcwd()
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
-root = "../dataset/public"
+parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
+parser.add_argument("--path_root", default="../dataset/public", help="path data")
+args = vars(parser.parse_args())
+
+root = args["path_root"]
 folder_frame = "frame-video"
 if not os.path.exists(os.path.join(root, folder_frame)):
     os.mkdir(os.path.join(root, folder_frame))
