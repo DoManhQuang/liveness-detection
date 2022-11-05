@@ -62,6 +62,35 @@ def load_data_image_directory(path_folder_data="../dataset", path_labels="labels
     return data_train, data_test, labels_train, labels_test
 
 
+def load_data_image_test(path_folder_data="../dataset", img_height=600, img_width=300, cnt_image=5):
+    print("====Start Loading ... ====")
+    data = []
+    labels = []
+
+    lst_frame_video = os.listdir(path_folder_data)
+    for i in tqdm(range(0, len(lst_frame_video))):
+        folder_frame_ids = os.path.join(path_folder_data, lst_frame_video[i])
+        lst_frame = os.listdir(folder_frame_ids)
+        cnt = 0
+        for frame in lst_frame:
+            if cnt == cnt_image:
+                break
+            image = load_img(os.path.join(folder_frame_ids, frame), target_size=(img_height, img_width))  # (img_height, img_width)
+            image = img_to_array(image)
+            image = tf.image.rgb_to_grayscale(image).numpy()
+            data.append(image)
+            labels.append(folder_frame_ids)
+
+    data = np.array(data)
+    labels = np.array(labels)
+
+    data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.2, shuffle=True,
+                                                                        stratify=labels, random_state=10000)
+
+    print("====End Done !!! ====")
+    return data_train, data_test, labels_train, labels_test
+
+
 def get_callbacks_list(diractory,
                        status_tensorboard=True,
                        status_checkpoint=True,
