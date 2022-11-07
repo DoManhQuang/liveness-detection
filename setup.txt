@@ -1,0 +1,10 @@
+matplotlib
+numpy
+pandas
+tensorflow
+tensorflow_addons
+seaborn
+tqdm
+scikit-learn
+opencv-python
+tensorflow_addons
