@@ -12,7 +12,7 @@ parser.add_argument("--path_labels", default="../dataset/train/label.csv", help=
 parser.add_argument("--path_data", default="../dataset/train/frame-video", help="path data image")
 parser.add_argument("--height", default=300, type=int, help="image height")
 parser.add_argument("--width", default=100, type=int, help="image width")
-parser.add_argument("--img_count", default=5, type=int, help="image count")
+parser.add_argument("--img_count", default=10, type=int, help="image count")
 parser.add_argument("--name", default="data-name", help="data name save")
 
 

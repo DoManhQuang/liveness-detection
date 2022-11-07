@@ -9,9 +9,11 @@ if str(ROOT) not in sys.path:
 
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument("--path_root", default="../dataset/public", help="path data")
+parser.add_argument("--img_cnt", default=10, type=int, help="number frame in video")
 args = vars(parser.parse_args())
 
 root = args["path_root"]
+img_cnt = args["img_cnt"]
 folder_frame = "frame-video"
 if not os.path.exists(os.path.join(root, folder_frame)):
     os.mkdir(os.path.join(root, folder_frame))
@@ -31,7 +33,7 @@ for i in range(0, len(lst_name_video)):
     if not cap.isOpened():
         print("\nError opening video file")
 
-    for cnt in tqdm(range(0, 10)):
+    for cnt in tqdm(range(0, img_cnt)):
         if cap.isOpened():
             ret, frame = cap.read()
             if ret:
