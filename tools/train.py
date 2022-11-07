@@ -12,20 +12,21 @@ from sklearn.metrics import roc_auc_score, f1_score, accuracy_score
 from sklearn import preprocessing
 from core.utils import load_data, get_callbacks_list, set_gpu_limit, write_score
 from core.model import model_classification
+from core.custom_metrics import equal_error_rate
 
 
 # # Parse command line arguments
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument("-m", "--memory", default=0, type=int, help="set gpu memory limit")
-parser.add_argument("-v", "--version", default="version-0.0", help="version running")
+parser.add_argument("-v", "--version", default="version-0.2", help="version running")
 parser.add_argument("-rp", "--result_path", default="../runs/results", help="path result ")
 parser.add_argument("-tp", "--training_path", default="../runs/training", help="path training model")
 parser.add_argument("-ep", "--epochs", default=1, type=int, help="epochs training")
-parser.add_argument("-bsize", "--bath_size", default=32, type=int, help="bath size training")
+parser.add_argument("-bsize", "--bath_size", default=8, type=int, help="bath size training")
 parser.add_argument("-verbose", "--verbose", default=1, type=int, help="verbose training")
-parser.add_argument("-train", "--train_data_path", default="../dataset/train/data-train.data", help="data training")
-parser.add_argument("-val", "--val_data_path", default="../dataset/smids/SMIDS/dataset/smids_valid.data", help="data val")
-parser.add_argument("-test", "--test_data_path", default="../dataset/train/data-test.data", help="data test")
+parser.add_argument("-train", "--train_data_path", default="../dataset/train/data-300x100-5-v1-train.data", help="data training")
+parser.add_argument("-val", "--val_data_path", default="../dataset/train/data-valid.data", help="data val")
+parser.add_argument("-test", "--test_data_path", default="../dataset/train/data-300x100-5-v1-test.data", help="data test")
 parser.add_argument("-name", "--name_model", default="model_ai_name", help="model name")
 # parser.add_argument("-cls", "--number_class", default=3, type=int, help="number class")
 args = vars(parser.parse_args())
@@ -62,7 +63,8 @@ num_classes = len(np.unique(global_labels_train))
 ip_shape = global_dataset_train[0].shape
 metrics = [
     # tfa.metrics.F1Score(num_classes=num_classes, average='weighted')
-    'accuracy'
+    # 'accuracy'
+    equal_error_rate
 ]
 
 model = model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid')
@@ -106,7 +108,7 @@ if not os.path.exists(result_path):
 
 # training
 
-file_ckpt_model = "best-weights-training-file-" + model_name + "-" + version + ".h5"
+file_ckpt_model = "best-weights-training-file-" + model_name + "-" + version + ".ckpt"
 # callback list
 callbacks_list, save_list = get_callbacks_list(training_path,
                                                status_tensorboard=True,
