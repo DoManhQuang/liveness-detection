@@ -27,8 +27,8 @@ def load_data(path_file):
     (pixels, labels) = pickle.load(file)
     # close the file
     file.close()
-    print(pixels.shape)
-    print(labels.shape)
+    # print(pixels.shape)
+    # print(labels.shape)
     return pixels, labels
 
 
@@ -181,7 +181,7 @@ def print_cmx(y_true, y_pred):
 def save_results_to_csv(dict_results, directory="./results", name="predict", version="version-0.0"):
     df_res = pd.DataFrame(data=dict_results)
     file_name = name + "-" + version + "-result.csv"
-    df_res.to_csv(os.path.join(directory, file_name), encoding="utf-8")
+    df_res.to_csv(os.path.join(directory, file_name), encoding="utf-8", index=False)
     print("SAVE DONE")
     pass
 
