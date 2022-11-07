@@ -62,33 +62,29 @@ def load_data_image_directory(path_folder_data="../dataset", path_labels="labels
     return data_train, data_test, labels_train, labels_test
 
 
-def load_data_image_test(path_folder_data="../dataset", img_height=600, img_width=300, cnt_image=5):
+def load_data_image_test(path_folder_data="../dataset", img_height=600, img_width=300, cnt_image=10):
     print("====Start Loading ... ====")
-    data = []
-    labels = []
-
+    dict_ids = {}
+    labels_ids = []
     lst_frame_video = os.listdir(path_folder_data)
     for i in tqdm(range(0, len(lst_frame_video))):
-        folder_frame_ids = os.path.join(path_folder_data, lst_frame_video[i])
-        lst_frame = os.listdir(folder_frame_ids)
+        folder_ids = lst_frame_video[i]
+        folder_ids_path = os.path.join(path_folder_data, folder_ids)
+        lst_frame = os.listdir(folder_ids_path)
         cnt = 0
+        data_ids = []
         for frame in lst_frame:
             if cnt == cnt_image:
                 break
-            image = load_img(os.path.join(folder_frame_ids, frame), target_size=(img_height, img_width))  # (img_height, img_width)
+            image = load_img(os.path.join(folder_ids_path, frame), target_size=(img_height, img_width))  # (img_height, img_width)
             image = img_to_array(image)
             image = tf.image.rgb_to_grayscale(image).numpy()
-            data.append(image)
-            labels.append(folder_frame_ids)
-
-    data = np.array(data)
-    labels = np.array(labels)
-
-    data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.2, shuffle=True,
-                                                                        stratify=labels, random_state=10000)
+            data_ids.append(image)
+        dict_ids[folder_ids] = data_ids
+        labels_ids.append(folder_ids)
 
     print("====End Done !!! ====")
-    return data_train, data_test, labels_train, labels_test
+    return dict_ids, np.array(labels_ids)
 
 
 def get_callbacks_list(diractory,
