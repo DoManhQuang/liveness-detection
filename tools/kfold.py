@@ -69,7 +69,8 @@ num_classes = len(np.unique(y))
 ip_shape = X[0].shape
 
 metrics = [
-    tfa.metrics.F1Score(num_classes=1, average="weighted", threshold=0.55)
+    # tfa.metrics.F1Score(num_classes=1, average="weighted", threshold=0.55)
+    'accuracy'
 ]
 
 model = model_classification(ip_shape, num_class=1, activation='sigmoid')
@@ -136,13 +137,13 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
     callbacks_list, save_list = get_callbacks_list(folder_roc_cnt_k_fold,
                                                    status_tensorboard=False,
                                                    status_checkpoint=flag_checkpoint,
-                                                   status_earlystop=False,
+                                                   status_earlystop=True,
                                                    file_ckpt=file_ckpt_model,
                                                    ckpt_monitor='val_f1_score',
                                                    ckpt_mode='max',
                                                    early_stop_monitor="val_loss",
                                                    early_stop_mode="min",
-                                                   early_stop_patience=2
+                                                   early_stop_patience=5
                                                    )
 
     file_k_fold_train = "k-fold-" + str(cnt_k_fold) + "-train-dataset.data"

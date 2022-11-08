@@ -64,9 +64,9 @@ num_classes = len(np.unique(global_labels_train))
 ip_shape = global_dataset_train[0].shape
 metrics = [
     # tfa.metrics.F1Score(num_classes=num_classes, average='weighted')
-    # 'accuracy'
+    'accuracy'
     # equal_error_rate
-    tfa.metrics.F1Score(num_classes=1, average="weighted", threshold=0.55)
+    # tfa.metrics.F1Score(num_classes=1, average="weighted", threshold=0.55)
 ]
 
 model = model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid')
