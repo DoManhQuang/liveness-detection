@@ -69,12 +69,12 @@ num_classes = len(np.unique(y))
 ip_shape = X[0].shape
 
 metrics = [
-    tfa.metrics.F1Score(num_classes=num_classes, average='weighted')
+    tfa.metrics.F1Score(num_classes=1, average="weighted", threshold=0.55)
 ]
 
-model = model_classification(ip_shape, num_class=num_classes)
+model = model_classification(ip_shape, num_class=1, activation='sigmoid')
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
-              loss=tf.keras.losses.CategoricalCrossentropy(),
+              loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               metrics=metrics)
 weights_init = model.get_weights()
 model.summary()

@@ -71,7 +71,7 @@ metrics = [
 
 model = model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid')
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
-              loss=equal_error_rate,
+              loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               metrics=metrics)
 model.summary()
 weights_init = model.get_weights()
