@@ -1,6 +1,7 @@
 from keras import backend as K
 import numpy as np
 from sklearn import metrics
+from keras.metrics import AUC
 
 
 def recall_m(y_true, y_pred):
@@ -36,6 +37,7 @@ github: https://github.com/YuanGongND/python-compute-eer
 
 
 def equal_error_rate(y_true, y_predict, positive_label=1, name="eer"):
+
     # all fpr, tpr, fnr, fnr, threshold are lists (in the format of np.array)
     fpr, tpr, threshold = metrics.roc_curve(y_true, y_predict, pos_label=positive_label)
     fnr = 1 - tpr
