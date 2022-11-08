@@ -47,6 +47,7 @@ print("loading model ...")
 metrics = [
     # tfa.metrics.F1Score(num_classes=num_classes, average='weighted')
     'accuracy'
+
 ]
 model = model_classification((300, 100, 1), num_class=1, activation='sigmoid')
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
