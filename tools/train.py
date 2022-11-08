@@ -13,6 +13,7 @@ from sklearn import preprocessing
 from core.utils import load_data, get_callbacks_list, set_gpu_limit, write_score
 from core.model import model_classification
 from core.custom_metrics import equal_error_rate
+import tensorflow_addons as tfa
 
 
 # # Parse command line arguments
@@ -64,12 +65,13 @@ ip_shape = global_dataset_train[0].shape
 metrics = [
     # tfa.metrics.F1Score(num_classes=num_classes, average='weighted')
     # 'accuracy'
-    equal_error_rate
+    # equal_error_rate
+    tfa.metrics.F1Score(num_classes=1, average="weighted", threshold=0.55)
 ]
 
 model = model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid')
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
-              loss=tf.keras.losses.BinaryCrossentropy(),
+              loss=equal_error_rate,
               metrics=metrics)
 model.summary()
 weights_init = model.get_weights()
