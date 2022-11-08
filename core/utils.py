@@ -32,7 +32,7 @@ def load_data(path_file):
     return pixels, labels
 
 
-def load_data_image_directory(path_folder_data="../dataset", path_labels="labels.csv", img_height=600, img_width=300, cnt_image=5):
+def load_data_image_directory(path_folder_data="../dataset", path_labels="labels.csv", img_height=600, img_width=300, cnt_image=5, mode='gray'):
     print("====Start Loading ... ====")
     data = []
     labels = []
@@ -42,13 +42,11 @@ def load_data_image_directory(path_folder_data="../dataset", path_labels="labels
         folder_name = labels_csv[i][0].split(".")[0]
         folder_frame_path = os.path.join(path_folder_data, folder_name)
         lst_frame = os.listdir(folder_frame_path)
-        cnt = 0
-        for frame in lst_frame:
-            if cnt == cnt_image:
-                break
-            image = load_img(os.path.join(folder_frame_path, frame), target_size=(img_height, img_width))  # (img_height, img_width)
+        for cnt in range(0, cnt_image):
+            image = load_img(os.path.join(folder_frame_path, lst_frame[cnt]), target_size=(img_height, img_width))  # (img_height, img_width)
             image = img_to_array(image)
-            image = tf.image.rgb_to_grayscale(image).numpy()
+            if mode == 'gray':
+                image = tf.image.rgb_to_grayscale(image).numpy()
             data.append(image)
             labels.append(labels_csv[i][1])
 
@@ -62,7 +60,7 @@ def load_data_image_directory(path_folder_data="../dataset", path_labels="labels
     return data_train, data_test, labels_train, labels_test
 
 
-def load_data_image_test(path_folder_data="../dataset", img_height=600, img_width=300, cnt_image=10):
+def load_data_image_test(path_folder_data="../dataset", img_height=600, img_width=300, cnt_image=10, mode='gray'):
     print("====Start Loading ... ====")
     dict_ids = {}
     labels_ids = []
@@ -71,14 +69,12 @@ def load_data_image_test(path_folder_data="../dataset", img_height=600, img_widt
         folder_ids = lst_frame_video[i]
         folder_ids_path = os.path.join(path_folder_data, folder_ids)
         lst_frame = os.listdir(folder_ids_path)
-        cnt = 0
         data_ids = []
-        for frame in lst_frame:
-            if cnt == cnt_image:
-                break
-            image = load_img(os.path.join(folder_ids_path, frame), target_size=(img_height, img_width))  # (img_height, img_width)
+        for cnt in range(0, cnt_image):
+            image = load_img(os.path.join(folder_ids_path, lst_frame[cnt]), target_size=(img_height, img_width))  # (img_height, img_width)
             image = img_to_array(image)
-            image = tf.image.rgb_to_grayscale(image).numpy()
+            if mode == 'gray':
+                image = tf.image.rgb_to_grayscale(image).numpy()
             data_ids.append(image)
         dict_ids[folder_ids] = data_ids
         labels_ids.append(folder_ids)
