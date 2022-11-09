@@ -16,7 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
 from core.utils import set_gpu_limit, load_data, save_dump, write_score, get_callbacks_list
-from core.model import model_classification
+from core.model import model_classification, model_mobile_v2_fine_tune
 from core.custom_metrics import equal_error_rate
 
 
@@ -34,9 +34,11 @@ parser.add_argument("-name", "--name_model", default="model_ai_name", help="mode
 parser.add_argument("-ep", "--epochs", default=1, type=int, help="epochs training")
 parser.add_argument("-bsize", "--bath_size", default=32, type=int, help="bath size training")
 parser.add_argument("-verbose", "--verbose", default=1, type=int, help="verbose training")
+parser.add_argument("--mode_model", default="name-model", help="mobi-v2")
 args = vars(parser.parse_args())
 
 # Set up paramet
+mode_model = args["mode_model"]
 epochs = args["epochs"]
 bath_size = args["bath_size"]
 verbose = args["verbose"]
@@ -73,7 +75,11 @@ metrics = [
     'accuracy'
 ]
 
-model = model_classification(ip_shape, num_class=1, activation='sigmoid')
+model = None
+if mode_model == "mobi-v2":
+    model = model_mobile_v2_fine_tune(input_shape=ip_shape, num_class=1, activation='sigmoid')
+else:
+    model = model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid')
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
               loss=tf.keras.losses.BinaryCrossentropy(),
               metrics=metrics)
