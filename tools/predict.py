@@ -3,21 +3,24 @@ import sys
 import tensorflow as tf
 import numpy as np
 from tqdm import tqdm
+from keras.models import load_model
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 ROOT = os.getcwd()
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
 from core.utils import load_data, save_results_to_csv
-from core.model import model_classification
+from core.model import model_classification, model_mobile_v2_fine_tune
 
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument("--save_result", default="../runs", help="path save data")
-parser.add_argument("--path_data", default="../dataset/public/data-300x100-5-v1-public-test.data", help="path data image")
+parser.add_argument("--path_data", default="../public-test.data", help="path data image")
 parser.add_argument("--name", default="data-name", help="data name save")
-parser.add_argument("--model_path", default="model.h5", help="model path")
-parser.add_argument("--best_ckpt_path", default="../runs/training/best-weights-training-file-model-300x100-5-version-0.2-100ep.h5", help="model check point path")
+parser.add_argument("--model_path", default="../model.h5", help="model path")
+parser.add_argument("--best_ckpt_path", default="../best-ckpt.h5", help="model check point path")
 parser.add_argument("-v", "--version", default="0.1", help="version running")
+parser.add_argument("--mode_weight", default="check-point", help="check-point or model-save")
+parser.add_argument("--mode_model", default="name-model", help="mobi-v2")
 
 args = vars(parser.parse_args())
 path_data = args["path_data"]
@@ -26,6 +29,8 @@ model_path = args["model_path"]
 best_ckpt_path = args["best_ckpt_path"]
 name = args["name"]
 save_result_path = args["save_result"]
+mode_model = args["mode_model"]
+mode_weight = args["mode_weight"]
 
 print("==== START =======")
 
@@ -49,13 +54,21 @@ metrics = [
     'accuracy'
 
 ]
-model = model_classification((300, 100, 1), num_class=1, activation='sigmoid')
-model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
-              loss=tf.keras.losses.BinaryCrossentropy(),
-              metrics=metrics)
+
+print("loading model ...")
+model = None
+if mode_model == "mobi-v2":
+    model = model_mobile_v2_fine_tune(input_shape=dict_data_test_pub['shape'], num_class=1, activation='sigmoid')
+else:
+    model = model_classification(input_layer=dict_data_test_pub['shape'], num_class=1, activation='sigmoid')
 model.summary()
-model.load_weights(best_ckpt_path)
+
+if mode_weight == 'check-point':
+    model.load_weights(best_ckpt_path)
+elif mode_weight == 'model-save':
+    model = load_model(model_path)
 print("loading model done")
+
 labels_ids = []
 res_min = []
 res_max = []

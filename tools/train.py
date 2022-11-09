@@ -7,13 +7,10 @@ if str(ROOT) not in sys.path:
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import numpy as np
 import tensorflow as tf
-import tensorflow_addons as tfa
 from sklearn.metrics import roc_auc_score, f1_score, accuracy_score
-from sklearn import preprocessing
 from core.utils import load_data, get_callbacks_list, set_gpu_limit, write_score
-from core.model import model_classification
+from core.model import model_classification, model_mobile_v2_fine_tune
 from core.custom_metrics import equal_error_rate
-import tensorflow_addons as tfa
 
 
 # # Parse command line arguments
@@ -29,7 +26,7 @@ parser.add_argument("-train", "--train_data_path", default="../dataset/train/dat
 parser.add_argument("-val", "--val_data_path", default="../dataset/train/data-valid.data", help="data val")
 parser.add_argument("-test", "--test_data_path", default="../dataset/train/data-300x100-5-v1-test.data", help="data test")
 parser.add_argument("-name", "--name_model", default="model_ai_name", help="model name")
-# parser.add_argument("-cls", "--number_class", default=3, type=int, help="number class")
+parser.add_argument("--mode_model", default="name-model", help="mobi-v2")
 args = vars(parser.parse_args())
 
 # Set up parameters
@@ -44,7 +41,7 @@ train_path = args["train_data_path"]
 val_path = args["val_data_path"]
 test_path = args["test_data_path"]
 model_name = args["name_model"]
-# num_classes = args["number_class"]
+mode_model = args["mode_model"]
 
 print("=========Start=========")
 if gpu_memory > 0:
@@ -63,13 +60,15 @@ print("=======loading dataset done!!=======")
 num_classes = len(np.unique(global_labels_train))
 ip_shape = global_dataset_train[0].shape
 metrics = [
-    # tfa.metrics.F1Score(num_classes=num_classes, average='weighted')
     'accuracy'
     # equal_error_rate
     # tfa.metrics.F1Score(num_classes=1, average="weighted", threshold=0.55)
 ]
-
-model = model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid')
+model = None
+if mode_model == "mobi-v2":
+    model = model_mobile_v2_fine_tune(input_shape=ip_shape, num_class=1, activation='sigmoid')
+else:
+    model = model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid')
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
               loss=tf.keras.losses.BinaryCrossentropy(),
               metrics=metrics)
@@ -121,7 +120,7 @@ callbacks_list, save_list = get_callbacks_list(training_path,
                                                ckpt_mode='max',
                                                early_stop_monitor="val_loss",
                                                early_stop_mode="min",
-                                               early_stop_patience=10
+                                               early_stop_patience=5
                                                )
 print("Callbacks List: ", callbacks_list)
 print("Save List: ", save_list)
@@ -156,14 +155,15 @@ file_result = model_name + version + "score.txt"
 write_score(path=os.path.join(result_path, file_result),
             mode_write="a",
             rows="STT",
-            cols=['F1', 'Acc'])
+            cols=['AUC', 'F1', 'Acc', 'EER'])
 
 write_score(path=os.path.join(result_path, file_result),
             mode_write="a",
             rows="results",
             cols=np.around([roc_auc_score(global_labels_test, y_predict, average='weighted'),
                             f1_score(global_labels_test, y_target, average='weighted'),
-                            accuracy_score(global_labels_test, y_target)], decimals=4))
+                            accuracy_score(global_labels_test, y_target),
+                            equal_error_rate(y_true=global_labels_test, y_predict=y_target)], decimals=4))
 print("save results done!!")
 print("History training loading ...")
 cmd = 'tensorboard --logdir "path-tensorboard-logs/"'
