@@ -76,6 +76,7 @@ def load_data_image_test(path_folder_data="../dataset", img_height=600, img_widt
             if mode == 'gray':
                 image = tf.image.rgb_to_grayscale(image).numpy()
             data_ids.append(image)
+            dict_ids['shape'] = np.array(image).shape
         dict_ids[folder_ids] = data_ids
         labels_ids.append(folder_ids)
 
