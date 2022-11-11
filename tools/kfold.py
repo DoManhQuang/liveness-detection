@@ -125,9 +125,7 @@ if number_k_fold > 0 and continue_k_fold == 1:
         cnt_k_fold += 1
 
 
-fold_dict = {}
-pred_folds_list = []
-cvscores = []
+cv_scores = []
 file_result_k_fold = model_name + "-" + version + "-k-fold-results.txt"
 for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
 
@@ -159,41 +157,52 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
 
     # train model
     print("K-Fold =", cnt_k_fold)
-    fold_dict = dict()
-    y_train_one_hot = tf.keras.utils.to_categorical(y_train, num_classes=num_classes)
-    y_test_one_hot = tf.keras.utils.to_categorical(y_test, num_classes=num_classes)
+    print("=============Training===========")
     model.set_weights(weights_init)
+    model.fit(X_train, y_train, epochs=epochs, batch_size=bath_size, verbose=verbose,
+              shuffle=True, callbacks=callbacks_list, validation_data=(X_test, y_test))
+    print("=============Training Done !!!===========")
 
-    model.fit(X_train, y_train_one_hot, epochs=epochs, batch_size=bath_size, verbose=verbose,
-              shuffle=True, callbacks=callbacks_list, validation_data=(X_test, y_test_one_hot))
+    # save model
+    print("Save model ....")
+    save_model_path = os.path.join(k_fold_path, "model-save-roc-" + str(cnt_k_fold))
+    if not os.path.exists(save_model_path):
+        os.makedirs(save_model_path)
+        print("created folder : ", save_model_path)
+    model_save_file = "model-" + model_name + "-" + version + "-roc" + str(cnt_k_fold) + ".h5"
+    model.save(os.path.join(save_model_path, model_save_file), save_format='h5')
+    print("Save model done!!")
 
     # load model
     if flag_checkpoint:
         model.load_weights(folder_roc_cnt_k_fold + "/checkpt/" + file_ckpt_model)
     # evaluate the model
-    scores = model.evaluate(X_test, y_test_one_hot, verbose=verbose)
+    scores = model.evaluate(X_test, y_test, verbose=verbose)
 
+    # predict the model
     y_predict = model.predict(X_test)
-    pred_folds_list.append(fold_dict)
-
-    y_true = np.argmax(y_test_one_hot, axis=1)
-    y_target = np.argmax(y_predict, axis=1)
+    y_target = []
+    for score in y_predict:
+        if score >= 0.5:
+            y_target.append(1)
+        else:
+            y_target.append(0)
 
     write_score(path=os.path.join(result_path, file_result_k_fold),
                 mode_write="a",
                 rows="K=" + str(cnt_k_fold),
-                cols=np.around([f1_score(y_true, y_target, average='weighted'),
-                                accuracy_score(y_true, y_target),
-                                recall_score(y_true, y_target, average='weighted'),
-                                precision_score(y_true, y_target, average='weighted'),
-                                equal_error_rate(y_true=y_true, y_predict=y_predict, positive_label=1)],
+                cols=np.around([f1_score(y_test, y_target, average='weighted'),
+                                accuracy_score(y_test, y_target),
+                                recall_score(y_test, y_target, average='weighted'),
+                                precision_score(y_test, y_target, average='weighted'),
+                                equal_error_rate(y_true=y_test, y_predict=y_predict, positive_label=1)],
                                decimals=4))
 
     print("%s: %.2f%%" % (model.metrics_names[0], scores[0] * 100))
     print("%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
-    cvscores.append(scores[1] * 100)
+    cv_scores.append(scores[1] * 100)
 
-print("%.2f%% (+/- %.2f%%)" % (np.mean(cvscores), np.std(cvscores)))
+print("%.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
 
 # # Deleting an non-empty folder
 # shutil.rmtree(diractory, ignore_errors=True)
