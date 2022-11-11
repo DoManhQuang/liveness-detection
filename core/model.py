@@ -142,28 +142,6 @@ def model_classification(input_layer, num_class=2, activation='softmax'):
     return model
 
 
-def model_fas_small(input_layer, conv_medium, name="head_small"):
-    conv_medium_down = Conv2D(8, kernel_size=(2, 2), activation='relu', padding='same')(conv_medium)
-    m_small = concatenate([input_layer, conv_medium_down], name=name)
-    return m_small
-
-
-def model_fas_medium(input_layer, conv_large, conv_small, name="head_medium"):
-    # m_small_a = block_conv_b(input_layer, filter_cnv_a=64, filter_cnv_b=64, filter_cnv_c=64, name="Block_Conv_B_1")
-    # m_small_a = block_identity_b(m_small_a, filter_cnv_a=32, filter_cnv_b=32, name="Block_Identity_B_1")
-    # m_small_a = MaxPooling2D(pool_size=(2, 2), name="MaxPooling2D_xA_1")(m_small_a)
-    # conv_small = Conv2D(8, kernel_size=(2, 2), activation='relu', padding='same')(conv_medium)
-    #
-    # x_concat_b = concatenate([x_conv_b_1, x_stem_conv_up_sample], name="concat_B_1")
-    # x_conv_b_2 = block_conv_b(x_concat_b, filter_cnv_a=32, filter_cnv_b=32, filter_cnv_c=32, name="Block_Conv_B_2")
-    # head_medium = block_identity_b(x_conv_b_2, filter_cnv_a=8, filter_cnv_b=8, name="head_medium")
-    pass
-
-
-def model_fas_architecture_head(input_layer, num_class=2, activation='softmax'):
-    pass
-
-
 def model_mobile_v2_fine_tune(input_shape=(224, 224, 3), num_class=2, activation='softmax'):
     base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=input_shape)
     for layer in base_model.layers:
