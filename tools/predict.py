@@ -1,6 +1,6 @@
 import os
 import sys
-import tensorflow as tf
+import tensorflow_addons as tfa
 import numpy as np
 from tqdm import tqdm
 from keras.models import load_model
@@ -21,6 +21,7 @@ parser.add_argument("--best_ckpt_path", default="../best-ckpt.h5", help="model c
 parser.add_argument("-v", "--version", default="0.1", help="version running")
 parser.add_argument("--mode_weight", default="check-point", help="check-point or model-save")
 parser.add_argument("--mode_model", default="name-model", help="mobi-v2")
+parser.add_argument("--custom_objects", default=False, help="True or False")
 
 args = vars(parser.parse_args())
 path_data = args["path_data"]
@@ -31,6 +32,7 @@ name = args["name"]
 save_result_path = args["save_result"]
 mode_model = args["mode_model"]
 mode_weight = args["mode_weight"]
+custom_objects = args["custom_objects"]
 
 print("==== START =======")
 
@@ -63,7 +65,10 @@ if mode_model == "mobi-v2":
 if mode_weight == 'check-point':
     model.load_weights(best_ckpt_path)
 elif mode_weight == 'model-save':
-    model = load_model(model_path)
+    if custom_objects:
+        model = load_model(model_path, custom_objects={"F1Score": tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)})
+    else:
+        model = load_model(model_path)
 print("loading model done")
 model.summary()
 
