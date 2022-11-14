@@ -59,15 +59,13 @@ print("loading model ...")
 model = None
 if mode_model == "mobi-v2":
     model = model_mobile_v2_fine_tune(input_shape=dict_data_test_pub['shape'], num_class=1, activation='sigmoid')
-else:
-    model = model_classification(input_layer=dict_data_test_pub['shape'], num_class=1, activation='sigmoid')
-model.summary()
 
 if mode_weight == 'check-point':
     model.load_weights(best_ckpt_path)
 elif mode_weight == 'model-save':
     model = load_model(model_path)
 print("loading model done")
+model.summary()
 
 labels_ids = []
 res_min = []
@@ -88,6 +86,7 @@ for i in tqdm(range(0, len(labels_test_pub))):
     pass
 print("model predict done")
 
+print("folder save result : ", save_result_path)
 save_results_to_csv(dict_results={
     "fname": labels_ids,
     "liveness_score": res_min
