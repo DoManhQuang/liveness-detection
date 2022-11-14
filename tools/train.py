@@ -7,10 +7,12 @@ if str(ROOT) not in sys.path:
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import numpy as np
 import tensorflow as tf
+import tensorflow_addons as tfa
 from sklearn.metrics import roc_auc_score, f1_score, accuracy_score
 from core.utils import load_data, get_callbacks_list, set_gpu_limit, write_score
 from core.model import model_classification, model_mobile_v2_fine_tune
 from core.custom_metrics import equal_error_rate
+from core.fas_base_01 import created_model_fas_01
 
 
 # # Parse command line arguments
@@ -60,15 +62,16 @@ print("=======loading dataset done!!=======")
 num_classes = len(np.unique(global_labels_train))
 ip_shape = global_dataset_train[0].shape
 metrics = [
-    'accuracy'
-    # equal_error_rate
-    # tfa.metrics.F1Score(num_classes=1, average="weighted", threshold=0.55)
+    'accuracy',
+    tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)
 ]
-model = None
-if mode_model == "mobi-v2":
-    model = model_mobile_v2_fine_tune(input_shape=ip_shape, num_class=1, activation='sigmoid')
-else:
-    model = model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid')
+
+dict_model = {
+    "mobi-v2": model_mobile_v2_fine_tune(input_shape=ip_shape, num_class=num_classes, activation='sigmoid'),
+    "model-g": model_classification(input_layer=ip_shape, num_class=num_classes, activation='sigmoid'),
+    "fas-v1": created_model_fas_01(input_shape=ip_shape, number_class=num_classes, activation='sigmoid')
+}
+model = dict_model[mode_model]
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
               loss=tf.keras.losses.BinaryCrossentropy(),
               metrics=metrics)
@@ -109,7 +112,7 @@ if not os.path.exists(result_path):
 
 # training
 
-file_ckpt_model = "best-weights-training-file-" + model_name + "-" + version + ".ckpt"
+file_ckpt_model = "best-weights-training-file-" + model_name + "-" + version + ".h5"
 # callback list
 callbacks_list, save_list = get_callbacks_list(training_path,
                                                status_tensorboard=True,
@@ -160,8 +163,8 @@ write_score(path=os.path.join(result_path, file_result),
 write_score(path=os.path.join(result_path, file_result),
             mode_write="a",
             rows="results",
-            cols=np.around([roc_auc_score(global_labels_test, y_predict, average='weighted'),
-                            f1_score(global_labels_test, y_target, average='weighted'),
+            cols=np.around([roc_auc_score(global_labels_test, y_predict, average='micro'),
+                            f1_score(global_labels_test, y_target, average='micro'),
                             accuracy_score(global_labels_test, y_target),
                             equal_error_rate(y_true=global_labels_test, y_predict=y_target)], decimals=4))
 print("save results done!!")
