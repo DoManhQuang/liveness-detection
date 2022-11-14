@@ -59,7 +59,7 @@ print("TRAIN : ", global_dataset_train.shape, " - ", global_labels_train.shape)
 print("TEST : ", global_dataset_test.shape, " - ", global_labels_test.shape)
 
 print("=======loading dataset done!!=======")
-num_classes = len(np.unique(global_labels_train))
+# num_classes = len(np.unique(global_labels_train))
 ip_shape = global_dataset_train[0].shape
 metrics = [
     'accuracy',
@@ -67,9 +67,9 @@ metrics = [
 ]
 
 dict_model = {
-    "mobi-v2": model_mobile_v2_fine_tune(input_shape=ip_shape, num_class=num_classes, activation='sigmoid'),
-    "model-g": model_classification(input_layer=ip_shape, num_class=num_classes, activation='sigmoid'),
-    "fas-v1": created_model_fas_01(input_shape=ip_shape, number_class=num_classes, activation='sigmoid')
+    "mobi-v2": model_mobile_v2_fine_tune(input_shape=ip_shape, num_class=1, activation='sigmoid'),
+    "model-g": model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid'),
+    "fas-v1": created_model_fas_01(input_shape=ip_shape, number_class=1, activation='sigmoid')
 }
 model = dict_model[mode_model]
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
