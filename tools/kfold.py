@@ -18,6 +18,7 @@ if str(ROOT) not in sys.path:
 from core.utils import set_gpu_limit, load_data, save_dump, write_score, get_callbacks_list
 from core.model import model_classification, model_mobile_v2_fine_tune
 from core.custom_metrics import equal_error_rate
+from core.fas_base_01 import created_model_fas_01
 
 
 # Parse command line arguments
@@ -71,15 +72,16 @@ num_classes = len(np.unique(y))
 ip_shape = X[0].shape
 
 metrics = [
-    # tfa.metrics.F1Score(num_classes=1, average="weighted", threshold=0.55)
-    'accuracy'
+    'accuracy',
+    tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)
 ]
 
-model = None
-if mode_model == "mobi-v2":
-    model = model_mobile_v2_fine_tune(input_shape=ip_shape, num_class=1, activation='sigmoid')
-else:
-    model = model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid')
+dict_model = {
+    "mobi-v2": model_mobile_v2_fine_tune(input_shape=ip_shape, num_class=num_classes, activation='sigmoid'),
+    "model-g": model_classification(input_layer=ip_shape, num_class=num_classes, activation='sigmoid'),
+    "fas-v1": created_model_fas_01(input_shape=ip_shape, number_class=num_classes, activation='sigmoid')
+}
+model = dict_model[mode_model]
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
               loss=tf.keras.losses.BinaryCrossentropy(),
               metrics=metrics)
@@ -139,7 +141,7 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
     flag_checkpoint = True
     # callback list
     callbacks_list, save_list = get_callbacks_list(folder_roc_cnt_k_fold,
-                                                   status_tensorboard=False,
+                                                   status_tensorboard=True,
                                                    status_checkpoint=flag_checkpoint,
                                                    status_earlystop=True,
                                                    file_ckpt=file_ckpt_model,
@@ -191,10 +193,10 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
     write_score(path=os.path.join(result_path, file_result_k_fold),
                 mode_write="a",
                 rows="K=" + str(cnt_k_fold),
-                cols=np.around([f1_score(y_test, y_target, average='weighted'),
+                cols=np.around([f1_score(y_test, y_target, average='micro'),
                                 accuracy_score(y_test, y_target),
-                                recall_score(y_test, y_target, average='weighted'),
-                                precision_score(y_test, y_target, average='weighted'),
+                                recall_score(y_test, y_target, average='micro'),
+                                precision_score(y_test, y_target, average='micro'),
                                 equal_error_rate(y_true=y_test, y_predict=y_predict, positive_label=1)],
                                decimals=4))
 
