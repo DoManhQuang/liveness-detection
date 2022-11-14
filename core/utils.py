@@ -32,12 +32,10 @@ def load_data(path_file):
     return pixels, labels
 
 
-def load_data_image_directory(path_folder_data="../dataset", path_labels="labels.csv", img_height=600, img_width=300, cnt_image=5, mode='gray'):
+def load_data_image_directory(labels_csv, path_folder_data="../dataset", img_height=600, img_width=300, cnt_image=5, mode='gray'):
     print("====Start Loading ... ====")
     data = []
     labels = []
-
-    labels_csv = np.array(pd.read_csv(path_labels, usecols=["fname", "liveness_score"]))
     for i in tqdm(range(0, len(labels_csv))):
         folder_name = labels_csv[i][0].split(".")[0]
         folder_frame_path = os.path.join(path_folder_data, folder_name)
@@ -49,15 +47,8 @@ def load_data_image_directory(path_folder_data="../dataset", path_labels="labels
                 image = tf.image.rgb_to_grayscale(image).numpy()
             data.append(image)
             labels.append(labels_csv[i][1])
-
-    data = np.array(data)
-    labels = np.array(labels)
-
-    data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.2, shuffle=True,
-                                                                        stratify=labels, random_state=10000)
-
     print("====End Done !!! ====")
-    return data_train, data_test, labels_train, labels_test
+    return np.array(data), np.array(labels)
 
 
 def load_data_image_test(path_folder_data="../dataset", img_height=600, img_width=300, cnt_image=10, mode='gray'):
