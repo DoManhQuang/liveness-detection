@@ -63,7 +63,13 @@ if mode_model == "mobi-v2":
     model = model_mobile_v2_fine_tune(input_shape=dict_data_test_pub['shape'], num_class=1, activation='sigmoid')
 
 if mode_weight == 'check-point':
+    print("loading weight model ...")
+    if custom_objects:
+        model = load_model(model_path, custom_objects={"F1Score": tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)})
+    else:
+        model = load_model(model_path)
     model.load_weights(best_ckpt_path)
+    print("loading weight model done!!")
 elif mode_weight == 'model-save':
     if custom_objects:
         model = load_model(model_path, custom_objects={"F1Score": tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)})
