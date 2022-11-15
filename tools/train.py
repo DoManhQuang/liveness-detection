@@ -7,9 +7,10 @@ if str(ROOT) not in sys.path:
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import tensorflow as tf
 import tensorflow_addons as tfa
-from core.utils import load_data, get_callbacks_list, set_gpu_limit, write_score
+from core.utils import load_data, get_callbacks_list, set_gpu_limit
 from core.model import model_classification, model_mobile_v2_fine_tune
 from core.fas_base_01 import created_model_fas_01
+from core.custom_metrics import equal_error_rate
 
 
 # # Parse command line arguments
@@ -59,6 +60,7 @@ print("=======loading dataset done!!=======")
 # num_classes = len(np.unique(global_labels_train))
 ip_shape = global_dataset_train[0].shape
 metrics = [
+    equal_error_rate,
     'accuracy',
     tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)
 ]
