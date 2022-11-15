@@ -117,7 +117,7 @@ def created_model_small(input_layer, name="Model_small"):
     xS = block_stem(input_layer, filter_cnv_a=256, name="Block_Stem")
     xS = AveragePooling2D((2, 2), name="AveragePooling2D")(xS)
     xB = block_conv_b(xS, filter_cnv_a=32, filter_cnv_b=32, filter_cnv_c=32, name="Block_Conv_B_1")
-    xB = block_identity_b(xB, filter_cnv_a=8, filter_cnv_b=8, name="Block_Identity_B_1")
+    xB = block_identity_b(xB, filter_cnv_a=8, filter_cnv_b=8, name=name)
     return xB
 
 
