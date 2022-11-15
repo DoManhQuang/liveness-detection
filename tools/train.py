@@ -5,13 +5,10 @@ if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
-from sklearn.metrics import roc_auc_score, f1_score, accuracy_score
 from core.utils import load_data, get_callbacks_list, set_gpu_limit, write_score
 from core.model import model_classification, model_mobile_v2_fine_tune
-from core.custom_metrics import equal_error_rate
 from core.fas_base_01 import created_model_fas_01
 
 
@@ -138,36 +135,12 @@ print("===========Training Done !!==============")
 model_save_file = "model-" + model_name + "-" + version + ".h5"
 model.save(os.path.join(training_path, 'model-save', model_save_file), save_format='h5')
 print("Save model done!!")
+
+# evaluate model
 scores = model.evaluate(global_dataset_test, global_labels_test, verbose=1)
 print("%s: %.2f%%" % (model.metrics_names[0], scores[0] * 100))
 print("%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
 
-print("testing model.....")
-y_predict = model.predict(global_dataset_test)
-y_target = []
-
-for score in y_predict:
-    if score >= 0.5:
-        y_target.append(1)
-    else:
-        y_target.append(0)
-
-print("save results ......")
-file_result = model_name + version + "score.txt"
-
-write_score(path=os.path.join(result_path, file_result),
-            mode_write="a",
-            rows="STT",
-            cols=['AUC', 'F1', 'Acc', 'EER'])
-
-write_score(path=os.path.join(result_path, file_result),
-            mode_write="a",
-            rows="results",
-            cols=np.around([roc_auc_score(global_labels_test, y_predict, average='micro'),
-                            f1_score(global_labels_test, y_target, average='micro'),
-                            accuracy_score(global_labels_test, y_target),
-                            equal_error_rate(y_true=global_labels_test, y_predict=y_target)], decimals=4))
-print("save results done!!")
 print("History training loading ...")
 cmd = 'tensorboard --logdir "path-tensorboard-logs/"'
 print("CMD: ", cmd)
