@@ -123,8 +123,8 @@ def matthews_correlation_coefficient(y_true, y_pred):
 
 
 def equal_error_rate(y_true, y_pred):
-    n_imp = tf.count_nonzero(tf.equal(y_true, 0), dtype=tf.float32) + tf.constant(K.epsilon())
-    n_gen = tf.count_nonzero(tf.equal(y_true, 1), dtype=tf.float32) + tf.constant(K.epsilon())
+    n_imp = tf.math.count_nonzero(tf.equal(y_true, 0), dtype=tf.float32) + tf.constant(K.epsilon())
+    n_gen = tf.math.count_nonzero(tf.equal(y_true, 1), dtype=tf.float32) + tf.constant(K.epsilon())
 
     scores_imp = tf.boolean_mask(y_pred, tf.equal(y_true, 0))
     scores_gen = tf.boolean_mask(y_pred, tf.equal(y_true, 1))
@@ -133,8 +133,8 @@ def equal_error_rate(y_true, y_pred):
     cond = lambda t, fpr, fnr: tf.greater_equal(fpr, fnr)
     body = lambda t, fpr, fnr: (
         t + 0.001,
-        tf.divide(tf.count_nonzero(tf.greater_equal(scores_imp, t), dtype=tf.float32), n_imp),
-        tf.divide(tf.count_nonzero(tf.less(scores_gen, t), dtype=tf.float32), n_gen)
+        tf.divide(tf.math.count_nonzero(tf.greater_equal(scores_imp, t), dtype=tf.float32), n_imp),
+        tf.divide(tf.math.count_nonzero(tf.less(scores_gen, t), dtype=tf.float32), n_gen)
     )
     t, fpr, fnr = tf.while_loop(cond, body, loop_vars, back_prop=False)
     eer = (fpr + fnr) / 2

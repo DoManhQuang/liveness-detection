@@ -115,12 +115,12 @@ file_ckpt_model = "best-weights-training-file-" + model_name + "-" + version + "
 # callback list
 callbacks_list, save_list = get_callbacks_list(training_path,
                                                status_tensorboard=True,
-                                               status_checkpoint=True,
+                                               status_checkpoint=False,
                                                status_earlystop=True,
                                                file_ckpt=file_ckpt_model,
                                                ckpt_monitor='val_accuracy',
                                                ckpt_mode='max',
-                                               early_stop_monitor="val_loss",
+                                               early_stop_monitor="val_equal_error_rate",
                                                early_stop_mode="min",
                                                early_stop_patience=5
                                                )

@@ -72,6 +72,7 @@ num_classes = len(np.unique(y))
 ip_shape = X[0].shape
 
 metrics = [
+    equal_error_rate,
     'accuracy',
     tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)
 ]
@@ -138,7 +139,7 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
 
     file_ckpt_model = model_name + "-" + version + "-weights-best-k-fold-" + str(cnt_k_fold) + ".h5"
     print("file check point : ", file_ckpt_model)
-    flag_checkpoint = True
+    flag_checkpoint = False
     # callback list
     callbacks_list, save_list = get_callbacks_list(folder_roc_cnt_k_fold,
                                                    status_tensorboard=True,
@@ -147,7 +148,7 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
                                                    file_ckpt=file_ckpt_model,
                                                    ckpt_monitor='val_f1_score',
                                                    ckpt_mode='max',
-                                                   early_stop_monitor="val_loss",
+                                                   early_stop_monitor="val_equal_error_rate",
                                                    early_stop_mode="min",
                                                    early_stop_patience=5
                                                    )

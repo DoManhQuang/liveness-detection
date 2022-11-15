@@ -70,6 +70,6 @@ def created_model_fas_01(input_shape, number_class, activation):
     return Model(inputs=input_layer, outputs=x)
 
 
-model = created_model_fas_01(input_shape=(300, 100, 3), number_class=1, activation='sigmoid')
-model.summary(show_trainable=True)
+# model = created_model_fas_01(input_shape=(300, 100, 3), number_class=1, activation='sigmoid')
+# model.summary(show_trainable=True)
 
