@@ -98,6 +98,13 @@ for i in tqdm(range(0, len(labels_test_pub))):
     res_median.append(np.median(y_predict))
     res_avg.append(np.average(y_predict))
     pass
+
+y_target = []
+for score in res_median:
+    if score > 0.5:
+        y_target.append(1)
+    else:
+        y_target.append(0)
 print("model predict done")
 
 print("folder save result : ", save_result_path)
@@ -131,5 +138,10 @@ save_results_to_csv(dict_results={
 }, version=version, name=name + "-predict-avg", directory=save_result_path)
 print("Save results avg done!!")
 
+save_results_to_csv(dict_results={
+    "fname": labels_ids,
+    "liveness_score": y_target
+}, version=version, name=name + "-predict-binary", directory=save_result_path)
+print("Save results binary done!!")
 
 print("==== END =======")
