@@ -36,6 +36,7 @@ parser.add_argument("-ep", "--epochs", default=1, type=int, help="epochs trainin
 parser.add_argument("-bsize", "--bath_size", default=32, type=int, help="bath size training")
 parser.add_argument("-verbose", "--verbose", default=1, type=int, help="verbose training")
 parser.add_argument("--mode_model", default="name-model", help="mobi-v2")
+parser.add_argument("--mode_split_data", default=False, help="is split data ? (False or True)")
 args = vars(parser.parse_args())
 
 # Set up paramet
@@ -52,6 +53,7 @@ number_k_fold = args["number_k_fold"]
 continue_k_fold = args["continue_k_fold"]
 train_path = args["train_data_path"]
 test_path = args["test_data_path"]
+mode_split_data = args["mode_split_data"]
 
 print("=======START=======")
 if gpu_memory > 0:
@@ -113,27 +115,30 @@ if not os.path.exists(k_fold_path):
     os.makedirs(k_fold_path)
     print("created folder : ", k_fold_path)
 
-# created data k fold
-if number_k_fold > 0 and continue_k_fold == 1:
-    cnt_k_fold = 1
-    k_fold_split = StratifiedKFold(n_splits=number_k_fold, shuffle=True, random_state=10000)
-    for train, test in k_fold_split.split(X, y):
-        print(X[train].shape, type(X[train]), y[test].shape, type(y[test]))
-        file_k_fold_train = "k-fold-" + str(cnt_k_fold) + "-train-dataset.data"
-        file_k_fold_test = "k-fold-" + str(cnt_k_fold) + "-test-dataset.data"
-        save_dump(os.path.join(k_fold_path, file_k_fold_train), X[train], y[train])
-        save_dump(os.path.join(k_fold_path, file_k_fold_test), X[test], y[test])
-        print("created file : ", os.path.join(k_fold_path, file_k_fold_train))
-        print("created file : ", os.path.join(k_fold_path, file_k_fold_test))
-        cnt_k_fold += 1
+if not mode_split_data:
+    # created data k fold
+    if number_k_fold > 0 and continue_k_fold == 1:
+        cnt_k_fold = 1
+        k_fold_split = StratifiedKFold(n_splits=number_k_fold, shuffle=True, random_state=10000)
+        for train, test in k_fold_split.split(X, y):
+            print(X[train].shape, type(X[train]), y[test].shape, type(y[test]))
+            file_k_fold_train = "k-fold-" + str(cnt_k_fold) + "-train-dataset.data"
+            file_k_fold_test = "k-fold-" + str(cnt_k_fold) + "-test-dataset.data"
+            save_dump(os.path.join(k_fold_path, file_k_fold_train), X[train], y[train])
+            save_dump(os.path.join(k_fold_path, file_k_fold_test), X[test], y[test])
+            print("created file : ", os.path.join(k_fold_path, file_k_fold_train))
+            print("created file : ", os.path.join(k_fold_path, file_k_fold_test))
+            cnt_k_fold += 1
 
-
+fold_dict = {}
+pred_folds_list = []
 cv_scores = []
 file_result_k_fold = model_name + "-" + version + "-k-fold-results.txt"
 for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
 
     if cnt_k_fold == 1:
-        write_score(path=os.path.join(result_path, file_result_k_fold), rows="STT", cols=["F1", "Acc", "recall", "precision", "eer"])
+        write_score(path=os.path.join(result_path, file_result_k_fold),
+                    rows="STT", cols=["F1", "Acc", "recall", "precision"])
     roc_name = "roc-" + str(cnt_k_fold)
     folder_roc_cnt_k_fold = os.path.join(k_fold_path, roc_name)
 
@@ -158,6 +163,8 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
     X_train, y_train = load_data(path_file=os.path.join(k_fold_path, file_k_fold_train))
     X_test, y_test = load_data(path_file=os.path.join(k_fold_path, file_k_fold_test))
 
+    print("TRAIN : ", X_train.shape, " - ", y_train.shape)
+    print("TRAIN : ", X_test.shape, " - ", y_test.shape)
     # train model
     print("K-Fold =", cnt_k_fold)
     print("=============Training===========")
@@ -197,8 +204,7 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
                 cols=np.around([f1_score(y_test, y_target, average='micro'),
                                 accuracy_score(y_test, y_target),
                                 recall_score(y_test, y_target, average='micro'),
-                                precision_score(y_test, y_target, average='micro'),
-                                equal_error_rate(y_true=y_test, y_predict=y_predict, positive_label=1)],
+                                precision_score(y_test, y_target, average='micro')],
                                decimals=4))
 
     print("%s: %.2f%%" % (model.metrics_names[0], scores[0] * 100))

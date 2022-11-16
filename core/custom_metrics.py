@@ -136,6 +136,6 @@ def equal_error_rate(y_true, y_pred):
         tf.divide(tf.math.count_nonzero(tf.greater_equal(scores_imp, t), dtype=tf.float32), n_imp),
         tf.divide(tf.math.count_nonzero(tf.less(scores_gen, t), dtype=tf.float32), n_gen)
     )
-    t, fpr, fnr = tf.while_loop(cond, body, loop_vars, back_prop=False)
+    t, fpr, fnr = tf.nest.map_structure(tf.stop_gradient, tf.while_loop(cond, body, loop_vars))
     eer = (fpr + fnr) / 2
     return eer
