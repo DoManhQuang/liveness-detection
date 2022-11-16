@@ -40,7 +40,7 @@ x_train, x_test, y_train, y_test = train_test_split(labels_csv_ids, labels_csv_s
                                                     random_state=1000, shuffle=True, stratify=labels_csv_score)
 
 data_train = np.concatenate(([x_train], [y_train]), axis=0).T
-data_test = np.concatenate(([x_test], [x_test]), axis=0).T
+data_test = np.concatenate(([x_test], [y_test]), axis=0).T
 print("TRAIN : ", data_train.shape)
 print("TEST : ", data_test.shape)
 
@@ -49,7 +49,7 @@ train_data, labels_train = load_data_image_directory(labels_csv=data_train, path
                                                      img_width=img_width, cnt_image=cnt_image, mode=mode_color)
 print("=====Processing data train Done !!========")
 print("=====Processing data test ========")
-test_data, labels_test = load_data_image_directory(labels_csv=data_train, path_folder_data=path_data, img_height=img_height,
+test_data, labels_test = load_data_image_directory(labels_csv=data_test, path_folder_data=path_data, img_height=img_height,
                                                    img_width=img_width, cnt_image=cnt_image, mode=mode_color)
 print("=====Processing data test Done !!========")
 
