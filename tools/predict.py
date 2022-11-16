@@ -11,6 +11,7 @@ if str(ROOT) not in sys.path:
 
 from core.utils import load_data, save_results_to_csv
 from core.model import model_classification, model_mobile_v2_fine_tune
+from core.custom_metrics import equal_error_rate
 
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument("--save_result", default="../runs", help="path save data")
@@ -65,14 +66,16 @@ if mode_model == "mobi-v2":
 if mode_weight == 'check-point':
     print("loading weight model ...")
     if custom_objects:
-        model = load_model(model_path, custom_objects={"F1Score": tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)})
+        model = load_model(model_path, custom_objects={"F1Score": tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5),
+                                                       "equal_error_rate": equal_error_rate})
     else:
         model = load_model(model_path)
     model.load_weights(best_ckpt_path)
     print("loading weight model done!!")
 elif mode_weight == 'model-save':
     if custom_objects:
-        model = load_model(model_path, custom_objects={"F1Score": tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)})
+        model = load_model(model_path, custom_objects={"F1Score": tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5),
+                                                       "equal_error_rate": equal_error_rate})
     else:
         model = load_model(model_path)
 print("loading model done")
