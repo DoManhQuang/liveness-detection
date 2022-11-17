@@ -72,9 +72,9 @@ num_classes = len(np.unique(y))
 ip_shape = X[0].shape
 
 metrics = [
-    equal_error_rate,
+    # equal_error_rate,
     'accuracy',
-    tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)
+    # tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)
 ]
 
 dict_model = {
@@ -198,7 +198,7 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
                                 accuracy_score(y_test, y_target),
                                 recall_score(y_test, y_target, average='micro'),
                                 precision_score(y_test, y_target, average='micro'),
-                                equal_error_rate(y_true=y_test, y_predict=y_predict, positive_label=1)],
+                                equal_error_rate(y_true=y_test, y_predict=y_predict)],
                                decimals=4))
 
     print("%s: %.2f%%" % (model.metrics_names[0], scores[0] * 100))
