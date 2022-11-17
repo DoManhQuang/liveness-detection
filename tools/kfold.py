@@ -153,7 +153,7 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
                                                    file_ckpt=file_ckpt_model,
                                                    ckpt_monitor='val_f1_score',
                                                    ckpt_mode='max',
-                                                   early_stop_monitor="val_equal_error_rate",
+                                                   early_stop_monitor="val_loss",
                                                    early_stop_mode="min",
                                                    early_stop_patience=5
                                                    )
