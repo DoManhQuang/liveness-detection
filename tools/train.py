@@ -61,8 +61,9 @@ print("=======loading dataset done!!=======")
 ip_shape = global_dataset_train[0].shape
 metrics = [
     equal_error_rate,
-    'accuracy',
-    tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)
+    # 'accuracy',
+    # tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)
+    'binary_accuracy'
 ]
 
 dict_model = {
@@ -118,11 +119,11 @@ callbacks_list, save_list = get_callbacks_list(training_path,
                                                status_checkpoint=False,
                                                status_earlystop=True,
                                                file_ckpt=file_ckpt_model,
-                                               ckpt_monitor='val_accuracy',
+                                               ckpt_monitor='val_binary_accuracy',
                                                ckpt_mode='max',
                                                early_stop_monitor="val_equal_error_rate",
                                                early_stop_mode="min",
-                                               early_stop_patience=5
+                                               early_stop_patience=10
                                                )
 print("Callbacks List: ", callbacks_list)
 print("Save List: ", save_list)
