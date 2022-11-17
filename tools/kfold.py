@@ -186,7 +186,7 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
     y_predict = model.predict(X_test)
     y_target = []
     for score in y_predict:
-        if score >= 0.5:
+        if score > 0.5:
             y_target.append(1)
         else:
             y_target.append(0)
@@ -198,7 +198,7 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
                                 accuracy_score(y_test, y_target),
                                 recall_score(y_test, y_target, average='micro'),
                                 precision_score(y_test, y_target, average='micro'),
-                                equal_error_rate(y_true=y_test, y_pred=y_predict)],
+                                equal_error_rate(y_test, y_predict)],
                                decimals=4))
 
     print("%s: %.2f%%" % (model.metrics_names[0], scores[0] * 100))
@@ -206,7 +206,3 @@ for cnt_k_fold in range(continue_k_fold, number_k_fold + 1):
     cv_scores.append(scores[1] * 100)
 
 print("%.2f%% (+/- %.2f%%)" % (np.mean(cv_scores), np.std(cv_scores)))
-
-# # Deleting an non-empty folder
-# shutil.rmtree(diractory, ignore_errors=True)
-# print("Deleted '%s' directory successfully" % diractory)
