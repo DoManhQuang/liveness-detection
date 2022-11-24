@@ -6,10 +6,11 @@ import seaborn as sn
 import tensorflow as tf
 from keras.callbacks import ModelCheckpoint
 from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 import numpy as np
 from keras.utils import img_to_array, load_img
+from keras.applications.resnet import preprocess_input
+import cv2
 
 
 def save_dump(file_path, data, labels):
@@ -32,7 +33,7 @@ def load_data(path_file):
     return pixels, labels
 
 
-def load_data_image_directory(labels_csv, path_folder_data="../dataset", img_height=600, img_width=300, cnt_image=5, mode='gray'):
+def load_data_image_directory(labels_csv, path_folder_data="../dataset", img_height=600, img_width=300, cnt_image=5, mode='gray', mode_preprocess_input=False):
     print("====Start Loading ... ====")
     data = []
     labels = []
@@ -45,13 +46,15 @@ def load_data_image_directory(labels_csv, path_folder_data="../dataset", img_hei
             image = img_to_array(image)
             if mode == 'gray':
                 image = tf.image.rgb_to_grayscale(image).numpy()
+            if mode_preprocess_input:
+                image = preprocess_input(image)
             data.append(image)
             labels.append(labels_csv[i][1])
     print("====End Done !!! ====")
     return np.array(data), np.array(labels)
 
 
-def load_data_image_test(path_folder_data="../dataset", img_height=600, img_width=300, cnt_image=10, mode='gray'):
+def load_data_image_test(path_folder_data="../dataset", img_height=600, img_width=300, cnt_image=10, mode='gray', mode_preprocess_input=False):
     print("====Start Loading ... ====")
     dict_ids = {}
     labels_ids = []
@@ -66,6 +69,8 @@ def load_data_image_test(path_folder_data="../dataset", img_height=600, img_widt
             image = img_to_array(image)
             if mode == 'gray':
                 image = tf.image.rgb_to_grayscale(image).numpy()
+            if mode_preprocess_input:
+                image = preprocess_input(image)
             data_ids.append(image)
             dict_ids['shape'] = np.array(image).shape
         dict_ids[folder_ids] = data_ids
@@ -79,7 +84,7 @@ def get_callbacks_list(diractory,
                        status_tensorboard=True,
                        status_checkpoint=True,
                        status_earlystop=True,
-                       file_ckpt="ghtk-spamham-weights-best-training-file.hdf5",
+                       file_ckpt="weights-best-training-file.hdf5",
                        ckpt_monitor='val_accuracy',
                        ckpt_mode='max',
                        early_stop_monitor="val_accuracy",
@@ -198,3 +203,26 @@ def set_gpu_limit(set_memory=5):
         except RuntimeError as e:
             # Virtual devices must be set before GPUs have been initialized
             print(e)
+
+
+def face_detect(frame, face_net, dsize=(224, 224)):
+    (h, w) = frame.shape[:2]
+    blob = cv2.dnn.blobFromImage(frame, 1.0, (224, 224),
+                                 (104.0, 177.0, 123.0))
+
+    face_net.setInput(blob)
+    detections = face_net.forward()
+    # print(detections.shape)
+    faces = []
+    # locs = []
+    for i in range(0, detections.shape[2]):
+        confidence = detections[0, 0, i, 2]
+        if confidence > 0.5:
+            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+            (startX, startY, endX, endY) = box.astype("int")
+            (startX, startY) = (max(0, startX), max(0, startY))
+            (endX, endY) = (min(w - 1, endX), min(h - 1, endY))
+            face = frame[startY:endY, startX:endX]
+            face = cv2.resize(face, dsize)
+            faces.append(face)
+    return np.array(faces, dtype="float32")
