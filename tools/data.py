@@ -18,6 +18,7 @@ parser.add_argument("--width", default=100, type=int, help="image width")
 parser.add_argument("--img_count", default=10, type=int, help="image count")
 parser.add_argument("--name", default="data-name", help="data name save")
 parser.add_argument("--mode_color", default="gray", help="color image [gray | rgb]")
+parser.add_argument("--mode_input", default=False, help="mode input image [True | False]")
 
 args = vars(parser.parse_args())
 path_save = args["save"]
@@ -28,6 +29,7 @@ img_width = args["width"]
 cnt_image = args["img_count"]
 data_name = args["name"]
 mode_color = args["mode_color"]
+mode_input = args["mode_input"]
 
 print("======START=========")
 labels_csv = np.array(pd.read_csv(path_label, usecols=["fname", "liveness_score"]))
@@ -46,11 +48,11 @@ print("TEST : ", data_test.shape)
 
 print("=====Processing data train ========")
 train_data, labels_train = load_data_image_directory(labels_csv=data_train, path_folder_data=path_data, img_height=img_height,
-                                                     img_width=img_width, cnt_image=cnt_image, mode=mode_color)
+                                                     img_width=img_width, cnt_image=cnt_image, mode=mode_color, mode_preprocess_input=mode_input)
 print("=====Processing data train Done !!========")
 print("=====Processing data test ========")
 test_data, labels_test = load_data_image_directory(labels_csv=data_test, path_folder_data=path_data, img_height=img_height,
-                                                   img_width=img_width, cnt_image=cnt_image, mode=mode_color)
+                                                   img_width=img_width, cnt_image=cnt_image, mode=mode_color, mode_preprocess_input=mode_input)
 print("=====Processing data test Done !!========")
 
 print("save data ...")
