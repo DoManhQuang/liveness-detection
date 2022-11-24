@@ -19,6 +19,7 @@ parser.add_argument("--img_count", default=10, type=int, help="image count")
 parser.add_argument("--name", default="data-name", help="data name save")
 parser.add_argument("--mode_color", default="gray", help="color image [gray | rgb]")
 parser.add_argument("--mode_input", default=False, help="mode input image [True | False]")
+parser.add_argument("--test_size", default=0.2, help="split train test size")
 
 args = vars(parser.parse_args())
 path_save = args["save"]
@@ -30,6 +31,7 @@ cnt_image = args["img_count"]
 data_name = args["name"]
 mode_color = args["mode_color"]
 mode_input = args["mode_input"]
+test_size = args["test_size"]
 
 print("======START=========")
 labels_csv = np.array(pd.read_csv(path_label, usecols=["fname", "liveness_score"]))
@@ -38,7 +40,7 @@ labels_csv_score = labels_csv[:, 1]
 print("labels_csv_ids : ", labels_csv_ids)
 print("labels_csv_score : ", labels_csv_score)
 
-x_train, x_test, y_train, y_test = train_test_split(labels_csv_ids, labels_csv_score, test_size=0.2,
+x_train, x_test, y_train, y_test = train_test_split(labels_csv_ids, labels_csv_score, test_size=test_size,
                                                     random_state=1000, shuffle=True, stratify=labels_csv_score)
 
 data_train = np.concatenate(([x_train], [y_train]), axis=0).T
