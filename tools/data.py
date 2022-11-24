@@ -19,7 +19,7 @@ parser.add_argument("--img_count", default=10, type=int, help="image count")
 parser.add_argument("--name", default="data-name", help="data name save")
 parser.add_argument("--mode_color", default="gray", help="color image [gray | rgb]")
 parser.add_argument("--mode_input", default=False, help="mode input image [True | False]")
-parser.add_argument("--test_size", default=0.2, help="split train test size")
+parser.add_argument("--test_size", default=0.2, type=float, help="split train test size")
 
 args = vars(parser.parse_args())
 path_save = args["save"]
