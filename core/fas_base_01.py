@@ -17,7 +17,6 @@ def block_stem(x, filter_cnv, pool_size=(2, 2), kernel_size=7, strides=1,  activ
 
 
 def block_conv(x, filter_block, activation='relu', padding='same', name="block_conv"):
-    print(x.shape)
     conv_a = Conv2D(filter_block, kernel_size=1, strides=2,  activation=activation, padding=padding)(x)
     conv_a = Conv2D(filter_block//2, kernel_size=7, strides=1, activation=activation, padding=padding)(conv_a)
     conv_a = BatchNormalization()(conv_a)
@@ -65,15 +64,10 @@ def block_identity_group(x, filter_blocks, activation='relu', padding='same', na
 def created_model_fas_01(input_shape, number_class, activation):
     input_layer = Input(shape=input_shape)
     x_stem = block_stem(x=input_layer, filter_cnv=64, pool_size=(2, 2), kernel_size=5, strides=1, activation='relu', padding='same', name="Block_Stem")
-    # x = block_conv(x=x, filter_block=32, activation='relu', padding='same', name="block_conv_a")
-    x_conv = block_conv(x=x_stem, filter_block=64, activation='relu', padding='same', name="block_conv_a")
-    # x = block_identity_group(x=x, filter_blocks=[64, 16], activation='relu', padding='same', name="block_identity_group_a")
+    x_conv = block_conv(x=x_stem, filter_block=32, activation='relu', padding='same', name="block_conv_a")
     x_base_a = block_identity(x_conv, filter_block=64, activation='relu', padding='same', name="block_identity_index_1")
-    x_base_b = block_identity(x_base_a, filter_block=32, activation='relu', padding='same', name="block_identity_index_2")
-    x_base_c = block_identity(x_base_b, filter_block=16, activation='relu', padding='same', name="block_identity_index_3")
-
-    conv_concat = concatenate([x_base_a, x_base_b, x_base_c], name="concat_base")
-
+    x_base_b = block_identity(x_base_a, filter_block=128, activation='relu', padding='same', name="block_identity_index_2")
+    conv_concat = concatenate([x_base_a, x_base_b, x_conv], name="concat_base")
     x = Flatten()(conv_concat)
     x = Dropout(0.5)(x)
     x = Dense(number_class, activation=activation)(x)
