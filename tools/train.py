@@ -3,7 +3,7 @@ import sys
 ROOT = os.getcwd()
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
-
+from keras.preprocessing.image import ImageDataGenerator
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import tensorflow as tf
 import tensorflow_addons as tfa
@@ -112,6 +112,13 @@ if not os.path.exists(result_path):
 
 # training
 
+train_datagen = ImageDataGenerator(
+        rescale=1./255,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True)
+test_datagen = ImageDataGenerator(rescale=1./255)
+
 file_ckpt_model = "best-weights-training-file-" + model_name + "-" + version + ".h5"
 # callback list
 callbacks_list, save_list = get_callbacks_list(training_path,
@@ -130,10 +137,18 @@ print("Save List: ", save_list)
 
 print("===========Training==============")
 
+train_datagen.fit(global_dataset_train)
+test_datagen.fit(global_dataset_test)
+
 model.set_weights(weights_init)
-model_history = model.fit(global_dataset_train, global_labels_train, epochs=epochs, batch_size=bath_size,
-                          verbose=verbose, validation_data=(global_dataset_test, global_labels_test),
-                          shuffle=True, callbacks=callbacks_list)
+# model_history = model.fit(global_dataset_train, global_labels_train, epochs=epochs, batch_size=bath_size,
+#                           verbose=verbose, validation_data=(global_dataset_test, global_labels_test),
+#                           shuffle=True, callbacks=callbacks_list)
+
+model.fit(train_datagen.flow(global_dataset_train, global_labels_train, batch_size=bath_size, subset='training', shuffle=True),
+          validation_data=test_datagen.flow(global_dataset_test, global_labels_test, batch_size=8, subset='validation', shuffle=True),
+          steps_per_epoch=len(global_dataset_train) / bath_size, epochs=epochs, shuffle=True, callbacks=callbacks_list)
+
 print("===========Training Done !!==============")
 model_save_file = "model-" + model_name + "-" + version + ".h5"
 model.save(os.path.join(training_path, 'model-save', model_save_file), save_format='h5')
