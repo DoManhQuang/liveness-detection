@@ -62,16 +62,16 @@ if mode_model == "mobi-v2":
 if mode_weight == 'check-point':
     print("loading weight model ...")
     if custom_objects:
-        model = load_model(model_path, custom_objects={"F1Score": tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)})
+        model = load_model(model_path, compile=False)
     else:
         model = load_model(model_path)
     model.load_weights(best_ckpt_path)
     print("loading weight model done!!")
 elif mode_weight == 'model-save':
     if custom_objects:
-        model = load_model(model_path, custom_objects={"F1Score": tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5)})
+        model = load_model(model_path, compile=False)
     else:
-        model = load_model(model_path)
+        model = load_model(model_path, compile=False)
 print("loading model done")
 model.summary()
 
