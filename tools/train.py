@@ -145,9 +145,9 @@ model.set_weights(weights_init)
 #                           verbose=verbose, validation_data=(global_dataset_test, global_labels_test),
 #                           shuffle=True, callbacks=callbacks_list)
 
-model.fit(train_datagen.flow(global_dataset_train, global_labels_train, batch_size=bath_size, subset='training', shuffle=True),
-          validation_data=test_datagen.flow(global_dataset_test, global_labels_test, batch_size=8, subset='validation', shuffle=True),
-          steps_per_epoch=len(global_dataset_train) / bath_size, epochs=epochs, shuffle=True, callbacks=callbacks_list)
+model.fit(train_datagen.flow(global_dataset_train, global_labels_train, batch_size=bath_size),
+          validation_data=test_datagen.flow(global_dataset_test, global_labels_test, batch_size=bath_size),
+          epochs=epochs, shuffle=True, callbacks=callbacks_list)
 
 print("===========Training Done !!==============")
 model_save_file = "model-" + model_name + "-" + version + ".h5"
