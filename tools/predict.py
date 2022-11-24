@@ -1,6 +1,6 @@
 import os
 import sys
-import tensorflow_addons as tfa
+import tensorflow as tf
 import numpy as np
 from tqdm import tqdm
 from keras.models import load_model
@@ -66,18 +66,16 @@ if mode_model == "mobi-v2":
 if mode_weight == 'check-point':
     print("loading weight model ...")
     if custom_objects:
-        model = load_model(model_path, custom_objects={"F1Score": tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5),
-                                                       "equal_error_rate": equal_error_rate})
+        model = load_model(model_path, compile=False)
     else:
         model = load_model(model_path)
     model.load_weights(best_ckpt_path)
     print("loading weight model done!!")
 elif mode_weight == 'model-save':
     if custom_objects:
-        model = load_model(model_path, custom_objects={"F1Score": tfa.metrics.F1Score(num_classes=1, average="micro", threshold=0.5),
-                                                       "equal_error_rate": equal_error_rate})
+        model = load_model(model_path, compile=False)
     else:
-        model = load_model(model_path)
+        model = load_model(model_path, compile=False)
 print("loading model done")
 model.summary()
 
@@ -143,5 +141,4 @@ save_results_to_csv(dict_results={
     "liveness_score": y_target
 }, version=version, name=name + "-predict-binary", directory=save_result_path)
 print("Save results binary done!!")
-
 print("==== END =======")

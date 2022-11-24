@@ -14,7 +14,7 @@ parser.add_argument("--width", default=100, type=int, help="image width")
 parser.add_argument("--img_count", default=10, type=int, help="image count")
 parser.add_argument("--name", default="data-name", help="data name save")
 parser.add_argument("--mode_color", default="gray", help="color image")
-
+parser.add_argument("--mode_input", default=False, help="mode input image [True | False]")
 args = vars(parser.parse_args())
 path_save = args["save"]
 path_data = args["path_data"]
@@ -23,8 +23,9 @@ img_width = args["width"]
 cnt_image = args["img_count"]
 data_name = args["name"]
 mode_color = args["mode_color"]
-
-dict_folder_ids, labels_ids = load_data_image_test(path_folder_data=path_data, img_height=img_height, img_width=img_width, cnt_image=cnt_image, mode=mode_color)
+mode_input = args["mode_input"]
+dict_folder_ids, labels_ids = load_data_image_test(path_folder_data=path_data, img_height=img_height,
+                                                   img_width=img_width, cnt_image=cnt_image, mode=mode_color, mode_preprocess_input=mode_input)
 
 print("PUBLIC TEST : ", len(dict_folder_ids), "-", labels_ids.shape)
 
