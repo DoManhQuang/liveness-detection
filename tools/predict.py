@@ -33,6 +33,10 @@ mode_weight = args["mode_weight"]
 custom_objects = args["custom_objects"]
 
 print("==== START =======")
+if not os.path.exists(save_result_path):
+    os.mkdir(save_result_path)
+    print("created folder :", save_result_path)
+
 save_result_path = os.path.join(save_result_path, "results")
 if not os.path.exists(save_result_path):
     os.mkdir(save_result_path)

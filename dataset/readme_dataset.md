@@ -1,14 +1,19 @@
-### config folder dataset    
+### follows: 
     dataset
-    ├───public-test                       
-    │   ├───frame-video 
-    │   ├───video
-    ├───public-test-2                       
-    │   ├───frame-video 
-    │   ├───video 
-    ├───private-test                       
-    |   ├───frame-video 
-    |   ├───video
-    ├───train                       
-    |   ├───frame-video 
-    |   ├───video
+    ├───public
+    │   ├───frame-video
+    │   └───videos
+    │   └───public-test.data
+    ├───public_test_2
+    │   ├───frame-video
+    │   └───videos
+    │   └───public-test-2.data
+    ├───pricate_test
+    │   ├───frame-video
+    │   └───videos
+    │   └───private-test.data
+    └───train
+        ├───frame-video
+        └───videos
+        └───data-train.data
+
