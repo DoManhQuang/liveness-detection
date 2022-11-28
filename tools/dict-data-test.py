@@ -27,6 +27,6 @@ mode_input = args["mode_input"]
 dict_folder_ids, labels_ids = load_data_image_test(path_folder_data=path_data, img_height=img_height,
                                                    img_width=img_width, cnt_image=cnt_image, mode=mode_color, mode_preprocess_input=mode_input)
 
-print("PUBLIC TEST : ", len(dict_folder_ids), "-", labels_ids.shape)
+print("DATA TEST : ", len(dict_folder_ids), "-", labels_ids.shape)
 
-save_dump(os.path.join(path_save, data_name + "-public-test.data"), data=dict_folder_ids, labels=labels_ids)
+save_dump(os.path.join(path_save, data_name + ".data"), data=dict_folder_ids, labels=labels_ids)
