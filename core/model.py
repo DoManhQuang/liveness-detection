@@ -1,5 +1,5 @@
 from keras.layers import Conv2D, Dropout, GlobalAveragePooling2D, GlobalMaxPooling2D
-from keras.applications.mobilenet_v2 import MobileNetV2
+# from keras.applications.mobilenet_v2 import MobileNetV2
 from keras import Input
 from keras.layers import Conv2D, Dropout, GlobalAveragePooling2D
 from keras.layers import Dense, BatchNormalization, MaxPooling2D, concatenate
@@ -130,16 +130,16 @@ def model_classification(input_layer, num_class=1, activation='sigmoid'):
     return Model(inputs=input_layer, outputs=x)
 
 
-def model_mobile_v2_fine_tune(input_shape=(224, 224, 3), num_class=2, activation='softmax'):
-    base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=input_shape)
-    for layer in base_model.layers:
-        layer.trainable = False
-
-    output_model = base_model.output
-    x = GlobalMaxPooling2D()(output_model)
-    x = Dropout(0.5)(x)
-    x = Dense(num_class, activation=activation)(x)
-    return Model(inputs=base_model.input, outputs=x)
+# def model_mobile_v2_fine_tune(input_shape=(224, 224, 3), num_class=2, activation='softmax'):
+#     base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=input_shape)
+#     for layer in base_model.layers:
+#         layer.trainable = False
+#
+#     output_model = base_model.output
+#     x = GlobalMaxPooling2D()(output_model)
+#     x = Dropout(0.5)(x)
+#     x = Dense(num_class, activation=activation)(x)
+#     return Model(inputs=base_model.input, outputs=x)
 
 
 # model = model_classification(input_layer=(300, 100, 3), num_class=1, activation='sigmoid')
