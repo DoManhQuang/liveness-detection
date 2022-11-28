@@ -1,6 +1,7 @@
 import os
 import shutil
 import sys
+import time
 import numpy as np
 from tqdm import tqdm
 from keras.models import load_model
@@ -79,6 +80,7 @@ model.summary()
 
 labels_ids = []
 res_median = []
+res_time = []
 # res_min = []
 # res_max = []
 # res_mean = []
@@ -86,9 +88,14 @@ res_median = []
 
 print("model predict ...")
 for i in tqdm(range(0, len(labels_test_pub))):
+    t1 = time.perf_counter()
     y_predict = model.predict(np.array(dict_data_test_pub[labels_test_pub[i]]), verbose=0)
+    t2 = time.perf_counter()
+    predicted_time = int(t2*1000 - t1*1000)
+    
     labels_ids.append(labels_test_pub[i] + ".mp4")
     res_median.append(np.median(y_predict))
+    res_time.append(predicted_time)
     # res_min.append(np.min(y_predict))
     # res_max.append(np.max(y_predict))
     # res_mean.append(np.mean(y_predict))
@@ -108,11 +115,23 @@ save_results_to_csv(dict_results={
     "liveness_score": res_median
 }, version=version, name=name + "-predict-median", directory=save_result_path)
 
-print("folder save result submit : ", save_submit)
+save_results_to_csv(dict_results={
+    "fname": labels_ids,
+    "time": res_time
+}, version=version, name=name + "-times", directory=save_result_path)
+
+# follow zalo
+
+print("follow zalo - folder save result submit : ", save_submit)
 save_results_to_csv(dict_results={
     "fname": labels_ids,
     "liveness_score": res_median
-}, version=version, name=name + "-predict-median-submit", directory=save_submit)
+}, version=version, name=name + "-py_submission-scores", directory=save_submit)
+
+save_results_to_csv(dict_results={
+    "fname": labels_ids,
+    "time": res_time
+}, version=version, name=name + "-py_submission-times", directory=save_submit)
 
 print("Save results median done!!")
 print("=====END====")
