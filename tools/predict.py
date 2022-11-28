@@ -1,14 +1,17 @@
 import os
+import shutil
 import sys
 import numpy as np
 from tqdm import tqdm
 from keras.models import load_model
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 ROOT = os.getcwd()
+if str(ROOT) == "/":
+    ROOT = "/code"
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 from core.utils import load_data, save_results_to_csv
-
+print("ROOT : ", ROOT)
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument("--save_result", default="../runs", help="path save data")
 parser.add_argument("--path_data", default="../public-test.data", help="path data image")
@@ -19,8 +22,10 @@ parser.add_argument("-v", "--version", default="0.1", help="version running")
 parser.add_argument("--mode_weight", default="check-point", help="check-point or model-save")
 parser.add_argument("--mode_model", default="name-model", help="mobi-v2")
 parser.add_argument("--custom_objects", default=False, help="True or False")
+parser.add_argument("--save_submit", default="../results", help="path save data")
 
 args = vars(parser.parse_args())
+save_submit = args["save_submit"]
 path_data = args["path_data"]
 version = args["version"]
 model_path = args["model_path"]
@@ -45,6 +50,10 @@ save_result_path = os.path.join(save_result_path, version)
 if not os.path.exists(save_result_path):
     os.mkdir(save_result_path)
     print("created folder :", save_result_path)
+
+if not os.path.exists(save_submit):
+    os.mkdir(save_submit)
+    print("created folder :", save_submit)
 
 print("loading data test ...")
 dict_data_test_pub, labels_test_pub = load_data(path_data)
@@ -98,7 +107,15 @@ save_results_to_csv(dict_results={
     "fname": labels_ids,
     "liveness_score": res_median
 }, version=version, name=name + "-predict-median", directory=save_result_path)
+
+print("folder save result submit : ", save_submit)
+save_results_to_csv(dict_results={
+    "fname": labels_ids,
+    "liveness_score": res_median
+}, version=version, name=name + "-predict-median-submit", directory=save_submit)
+
 print("Save results median done!!")
+print("=====END====")
 # save_results_to_csv(dict_results={
 #     "fname": labels_ids,
 #     "liveness_score": res_min

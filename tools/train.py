@@ -2,6 +2,8 @@ import os
 import sys
 from keras.models import load_model
 ROOT = os.getcwd()
+if str(ROOT) == "/":
+    ROOT = "/code"
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 from keras.preprocessing.image import ImageDataGenerator
@@ -13,6 +15,7 @@ from core.fas_base_01 import created_model_fas_01
 from core.custom_metrics import equal_error_rate
 
 
+print("ROOT : ", ROOT)
 # # Parse command line arguments
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument("-m", "--memory", default=0, type=int, help="set gpu memory limit")

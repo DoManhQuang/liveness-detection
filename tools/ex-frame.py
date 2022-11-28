@@ -4,8 +4,11 @@ from tqdm import tqdm
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import sys
 ROOT = os.getcwd()
+if str(ROOT) == "/":
+    ROOT = "/code"
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
+print("ROOT : ", ROOT)
 
 
 def save_image(video_cap, file_name, time_msec):

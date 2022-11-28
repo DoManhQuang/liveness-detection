@@ -176,7 +176,7 @@ def save_results_to_csv(dict_results, directory="./results", name="predict", ver
     file_name = name + "-" + version + "-result.csv"
     df_res.to_csv(os.path.join(directory, file_name), encoding="utf-8", index=False)
     print("SAVE DONE")
-    pass
+    return os.path.join(directory, file_name)
 
 
 def write_score(path="test.txt", mode_write="a", rows="STT", cols=[1.0, 2.0, 3.0]):

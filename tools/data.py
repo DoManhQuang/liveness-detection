@@ -5,8 +5,11 @@ import pandas as pd
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from sklearn.model_selection import train_test_split
 ROOT = os.getcwd()
+if str(ROOT) == "/":
+    ROOT = "/code"
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
+print("ROOT : ", ROOT)
 from core.utils import load_data_image_directory, save_dump
 
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
