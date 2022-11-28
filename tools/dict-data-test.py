@@ -2,8 +2,11 @@ import os
 import sys
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 ROOT = os.getcwd()
+if str(ROOT) == "/":
+    ROOT = "/code"
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
+print("ROOT : ", ROOT)
 from core.utils import load_data_image_test, save_dump
 
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
