@@ -8,7 +8,6 @@ ROOT = os.getcwd()
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 from core.utils import load_data, save_results_to_csv
-from core.custom_metrics import equal_error_rate
 
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument("--save_result", default="../runs", help="path save data")

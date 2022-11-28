@@ -1,14 +1,14 @@
 import os
 import sys
+from keras.models import load_model
 ROOT = os.getcwd()
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 from keras.preprocessing.image import ImageDataGenerator
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import tensorflow as tf
-import tensorflow_addons as tfa
 from core.utils import load_data, get_callbacks_list, set_gpu_limit
-from core.model import model_classification, model_mobile_v2_fine_tune
+from core.model import model_classification
 from core.fas_base_01 import created_model_fas_01
 from core.custom_metrics import equal_error_rate
 
@@ -27,6 +27,8 @@ parser.add_argument("-val", "--val_data_path", default="../dataset/train/data-va
 parser.add_argument("-test", "--test_data_path", default="../dataset/train/data-300x100-5-v1-test.data", help="data test")
 parser.add_argument("-name", "--name_model", default="model_ai_name", help="model name")
 parser.add_argument("--mode_model", default="name-model", help="mobi-v2")
+parser.add_argument("-resume", default="next", help="train next epoch")
+parser.add_argument("-model_path", help="using then resume = next")
 args = vars(parser.parse_args())
 
 # Set up parameters
@@ -42,6 +44,8 @@ val_path = args["val_data_path"]
 test_path = args["test_data_path"]
 model_name = args["name_model"]
 mode_model = args["mode_model"]
+resume = args["resume"]
+model_path = args["model_path"]
 
 print("=========Start=========")
 if gpu_memory > 0:
@@ -58,6 +62,8 @@ print("TEST : ", global_dataset_test.shape, " - ", global_labels_test.shape)
 
 print("=======loading dataset done!!=======")
 # num_classes = len(np.unique(global_labels_train))
+dict_model = None
+model = None
 ip_shape = global_dataset_train[0].shape
 metrics = [
     equal_error_rate,
@@ -66,14 +72,17 @@ metrics = [
     'binary_accuracy'
 ]
 
-dict_model = {
-    "model-g": model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid'),
-    "fas-v1": created_model_fas_01(input_shape=ip_shape, number_class=1, activation='sigmoid')
-}
-model = dict_model[mode_model]
+if resume == "next":
+    model = load_model(model_path, compile=False)
+else:
+    dict_model = {
+        "model-g": model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid'),
+        "fas-v1": created_model_fas_01(input_shape=ip_shape, number_class=1, activation='sigmoid')
+    }
+    model = dict_model[mode_model]
+
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
-              loss=tf.keras.losses.BinaryCrossentropy(),
-              metrics=metrics)
+              loss=tf.keras.losses.BinaryCrossentropy(), metrics=metrics)
 model.summary()
 weights_init = model.get_weights()
 print("model loading done!!")
