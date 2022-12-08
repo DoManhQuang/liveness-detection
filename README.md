@@ -60,7 +60,7 @@ python tools/dict-data-test.py \
 ### Training model
 ```shell
 cd liveness-detection
-!python tools/train.py \
+python tools/train.py \
 -v "version-turn-training" \
 -train "path-data-train.data" \
 -test "path-data-test.data" \
