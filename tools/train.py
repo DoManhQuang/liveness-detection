@@ -30,8 +30,8 @@ parser.add_argument("-val", "--val_data_path", default="../dataset/train/data-va
 parser.add_argument("-test", "--test_data_path", default="../dataset/train/data-300x100-5-v1-test.data", help="data test")
 parser.add_argument("-name", "--name_model", default="model_ai_name", help="model name")
 parser.add_argument("--mode_model", default="name-model", help="mobi-v2")
-parser.add_argument("-resume", default="next", help="train next epoch")
-parser.add_argument("-model_path", help="using then resume = next")
+parser.add_argument("-resume", default="begin", help="train next epoch (begin or continue)")
+parser.add_argument("-model_path", help="using then resume = continue")
 args = vars(parser.parse_args())
 
 # Set up parameters
@@ -75,9 +75,9 @@ metrics = [
     'binary_accuracy'
 ]
 
-if resume == "next":
+if resume == "continue":
     model = load_model(model_path, compile=False)
-else:
+elif resume == "begin":
     dict_model = {
         "model-g": model_classification(input_layer=ip_shape, num_class=1, activation='sigmoid'),
         "fas-v1": created_model_fas_01(input_shape=ip_shape, number_class=1, activation='sigmoid')

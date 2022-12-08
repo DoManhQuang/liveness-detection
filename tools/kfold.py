@@ -36,7 +36,6 @@ parser.add_argument("-ep", "--epochs", default=1, type=int, help="epochs trainin
 parser.add_argument("-bsize", "--bath_size", default=32, type=int, help="bath size training")
 parser.add_argument("-verbose", "--verbose", default=1, type=int, help="verbose training")
 parser.add_argument("--mode_model", default="name-model", help="mobi-v2")
-parser.add_argument("--mode_split_data", default=False, help="is split data ? (False or True)")
 args = vars(parser.parse_args())
 
 # Set up paramet
@@ -53,7 +52,6 @@ number_k_fold = args["number_k_fold"]
 continue_k_fold = args["continue_k_fold"]
 train_path = args["train_data_path"]
 test_path = args["test_data_path"]
-mode_split_data = args["mode_split_data"]
 
 print("=======START=======")
 if gpu_memory > 0:
@@ -116,20 +114,19 @@ if not os.path.exists(k_fold_path):
     os.makedirs(k_fold_path)
     print("created folder : ", k_fold_path)
 
-if not mode_split_data:
-    # created data k fold
-    if number_k_fold > 0 and continue_k_fold == 1:
-        cnt_k_fold = 1
-        k_fold_split = StratifiedKFold(n_splits=number_k_fold, shuffle=True, random_state=10000)
-        for train, test in k_fold_split.split(X, y):
-            print(X[train].shape, type(X[train]), y[test].shape, type(y[test]))
-            file_k_fold_train = "k-fold-" + str(cnt_k_fold) + "-train-dataset.data"
-            file_k_fold_test = "k-fold-" + str(cnt_k_fold) + "-test-dataset.data"
-            save_dump(os.path.join(k_fold_path, file_k_fold_train), X[train], y[train])
-            save_dump(os.path.join(k_fold_path, file_k_fold_test), X[test], y[test])
-            print("created file : ", os.path.join(k_fold_path, file_k_fold_train))
-            print("created file : ", os.path.join(k_fold_path, file_k_fold_test))
-            cnt_k_fold += 1
+# created data k fold
+if number_k_fold > 0 and continue_k_fold == 1:
+    cnt_k_fold = 1
+    k_fold_split = StratifiedKFold(n_splits=number_k_fold, shuffle=True, random_state=10000)
+    for train, test in k_fold_split.split(X, y):
+        print(X[train].shape, type(X[train]), y[test].shape, type(y[test]))
+        file_k_fold_train = "k-fold-" + str(cnt_k_fold) + "-train-dataset.data"
+        file_k_fold_test = "k-fold-" + str(cnt_k_fold) + "-test-dataset.data"
+        save_dump(os.path.join(k_fold_path, file_k_fold_train), X[train], y[train])
+        save_dump(os.path.join(k_fold_path, file_k_fold_test), X[test], y[test])
+        print("created file : ", os.path.join(k_fold_path, file_k_fold_train))
+        print("created file : ", os.path.join(k_fold_path, file_k_fold_test))
+        cnt_k_fold += 1
 
 fold_dict = {}
 pred_folds_list = []
