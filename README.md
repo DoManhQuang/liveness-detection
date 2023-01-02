@@ -15,7 +15,9 @@ In verification services related to face recognition (such as eKYC and face acce
 - Private test: 1253 videos of faces with facemask, without label file.
 
 ### Results Final Leaderboard
-private test score: loading ...
+private test score: 0.18382
+Rank: 26
+![image](https://user-images.githubusercontent.com/45645553/210210542-cf25e258-b208-48ba-854f-ab553d1a3ff0.png)
 
 ## Quick Start
 ### Install Lib
